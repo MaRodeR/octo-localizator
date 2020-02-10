@@ -1,0 +1,12 @@
+
+/* Class = "UIButton"; normalTitle = "Sign up."; ObjectID = "0ix-TJ-xZf"; */
+"0ix-TJ-xZf.normalTitle" = "Sign up";
+
+/* Class = "UILabel"; text = "You can update your profile anytime later in the app."; ObjectID = "604-zT-eWZ"; */
+"0l2-74-dYu.text" = "About me:";
+
+/* Class = "UILabel"; text = "Forgot your password?"; ObjectID = "2tx-IY-4Ap"; */
+"2tx-IY-4Ap.text" = "Forgot your password?";
+
+/* Class = "UILabel"; text = "Name"; ObjectID = "3ib-YA-eKx"; */
+"3ib-YA-eKx.text" = "Name";

@@ -1,0 +1,8 @@
+/* 
+  InfoPlist.strings
+  test example en
+*/
+
+NSLocationAlwaysAndWhenInUseUsageDescription = "needs to access";
+NSLocationWhenInUseUsageDescription = "your location";
+NSLocationAlwaysUsageDescription = "to find people nearby your location.";

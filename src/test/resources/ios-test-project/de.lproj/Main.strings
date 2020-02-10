@@ -1,0 +1,10 @@
+// Main.string file
+
+/* Class = "UIButton"; normalTitle = "Sign up."; ObjectID = "0ix-TJ-xZf"; */
+"0ix-TJ-xZf.normalTitle" = "Anmelden";
+
+/* Class = "UILabel"; text = "About me:"; ObjectID = "0l2-74-dYu"; */
+"0l2-74-dYu.text" = "Über mich:";
+
+/* Class = "UILabel"; text = "Forgot your password?"; ObjectID = "2tx-IY-4Ap"; */
+"2tx-IY-4Ap.text" = "Haben Sie Ihr Passwort vergessen?";

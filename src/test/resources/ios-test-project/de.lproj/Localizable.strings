@@ -1,0 +1,6 @@
+confirm = "";
+oops = "Ups ...";
+agree = "Zustimmen";
+disagree = "nicht einverstanden";
+success = "Erfolg!";
+mistake = "Fehler!";

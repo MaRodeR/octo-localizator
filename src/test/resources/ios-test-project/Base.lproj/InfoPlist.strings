@@ -1,0 +1,5 @@
+/* 
+  InfoPlist.strings
+  test example base
+*/
+mustBeIgnored = "test test test";

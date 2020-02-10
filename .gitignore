@@ -1,0 +1,19 @@
+/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+/src/test/resources/google-key.p12
+/src/test/resources/google-storage.config
