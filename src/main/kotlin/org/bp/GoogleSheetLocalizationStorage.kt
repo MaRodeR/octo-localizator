@@ -15,13 +15,14 @@ class GoogleSheetLocalizationStorage(
     private val pkFilePath: String
 ) : LocalizationStorage {
 
-    override fun getAll(sourceNames: List<String>?): List<LocalizationSource> {
-        val service = getSheetsService()
+    private val service by lazy { getSheetsService() }
 
-        val sheets = service.getSheetsFor(spreadSheetId)
+    override fun getAll(sourceNames: List<String>?): List<LocalizationSource> {
+
+        val sheets = service.getListOfSheetsFor(spreadSheetId)
 
         var localizationSources = sheets
-            .map { LocalizationSource(it.properties["title"].toString()) }
+            .map { LocalizationSource(it.getTitle()) }
 
         if (sourceNames != null) {
             localizationSources = localizationSources
@@ -58,14 +59,13 @@ class GoogleSheetLocalizationStorage(
     }
 
     override fun save(localization: LocalizationSource) {
-        val service = getSheetsService()
 
-        val spreadsheet = service.getSheetsFor(spreadSheetId)
         val sheetTitle = localization.name
+        val sheet = service.getListOfSheetsFor(spreadSheetId)
+            .findByTitle(sheetTitle)
 
-        val sheet = spreadsheet.findByTitle(sheetTitle)
         if (sheet == null) {
-            createSheet(service, spreadSheetId, sheetTitle)
+            createSheet(spreadSheetId, sheetTitle)
         }
 
         val locales = localization.getExistsLocaleNames()
@@ -87,13 +87,12 @@ class GoogleSheetLocalizationStorage(
     }
 
     override fun deleteAll(sourceName: String) {
-        val service = getSheetsService()
-        service.getSheetsFor(spreadSheetId)
+        service.getListOfSheetsFor(spreadSheetId)
             .findByTitle(sourceName)
-            ?.let { clearSheet(service, it.getSheetId()) }
+            ?.let { clearSheet(it.getSheetId()) }
     }
 
-    private fun createSheet(service: Sheets, spreadSheetId: String, sheetName: String) {
+    private fun createSheet(spreadSheetId: String, sheetName: String) {
         val request = Request().setAddSheet(
             AddSheetRequest().setProperties(SheetProperties().setTitle(sheetName))
         )
@@ -102,7 +101,7 @@ class GoogleSheetLocalizationStorage(
             .execute()
     }
 
-    private fun clearSheet(service: Sheets, sheetId: Int) {
+    private fun clearSheet(sheetId: Int) {
         val request = Request().setUpdateCells(
             UpdateCellsRequest()
                 .setFields("*")
@@ -150,14 +149,16 @@ class GoogleSheetLocalizationStorage(
         }
 
         private fun List<Sheet>.findByTitle(sheetName: String): Sheet? =
-            this.find { sheet -> sheet.properties["title"] == sheetName }
+            this.find { sheet -> sheet.getTitle() == sheetName }
 
-        private fun Sheets.getSheetsFor(spreadSheetId: String): List<Sheet> =
+        private fun Sheets.getListOfSheetsFor(spreadSheetId: String): List<Sheet> =
             spreadsheets().get(spreadSheetId).execute().sheets
 
         private fun Sheets.getSheetValues(spreadSheetId: String, sheetName: String): List<MutableList<Any>> =
             spreadsheets().values().get(spreadSheetId, sheetName).execute().getValues() ?: listOf()
 
         private fun Sheet.getSheetId() = properties["sheetId"] as Int
+
+        private fun Sheet.getTitle() = properties["title"] as String
     }
 }
