@@ -30,6 +30,9 @@ class GoogleSheetLocalizationStorage(
 
         localizationSources.forEach { source ->
             val values = service.getSheetValues(spreadSheetId, source.name)
+            if (values.isEmpty()) {
+                return@forEach
+            }
             val headerRow = values[0]
             val translationRows = values.subList(1, values.size)
 
@@ -61,9 +64,7 @@ class GoogleSheetLocalizationStorage(
         val sheetTitle = localization.name
 
         val sheet = spreadsheet.findByTitle(sheetTitle)
-        if (sheet != null) {
-            clearSheet(service, spreadSheetId, sheet.properties["sheetId"] as Int)
-        } else {
+        if (sheet == null) {
             createSheet(service, spreadSheetId, sheetTitle)
         }
 
@@ -85,6 +86,13 @@ class GoogleSheetLocalizationStorage(
             .execute()
     }
 
+    override fun deleteAll(sourceName: String) {
+        val service = getSheetsService()
+        service.getSheetsFor(spreadSheetId)
+            .findByTitle(sourceName)
+            ?.let { clearSheet(service, it.getSheetId()) }
+    }
+
     private fun createSheet(service: Sheets, spreadSheetId: String, sheetName: String) {
         val request = Request().setAddSheet(
             AddSheetRequest().setProperties(SheetProperties().setTitle(sheetName))
@@ -94,7 +102,7 @@ class GoogleSheetLocalizationStorage(
             .execute()
     }
 
-    private fun clearSheet(service: Sheets, spreadSheetId: String, sheetId: Int) {
+    private fun clearSheet(service: Sheets, sheetId: Int) {
         val request = Request().setUpdateCells(
             UpdateCellsRequest()
                 .setFields("*")
@@ -148,6 +156,8 @@ class GoogleSheetLocalizationStorage(
             spreadsheets().get(spreadSheetId).execute().sheets
 
         private fun Sheets.getSheetValues(spreadSheetId: String, sheetName: String): List<MutableList<Any>> =
-            spreadsheets().values().get(spreadSheetId, sheetName).execute().getValues()
+            spreadsheets().values().get(spreadSheetId, sheetName).execute().getValues() ?: listOf()
+
+        private fun Sheet.getSheetId() = properties["sheetId"] as Int
     }
 }

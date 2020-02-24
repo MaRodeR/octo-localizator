@@ -23,7 +23,7 @@ class LocalizationCopierTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     internal fun copyFromGoogleSheetToProject() {
         localizationCopier.copy(googleSheetLocalizationStorage, iosProjectLocalizationStorage,
             sourceNames = listOf("Main", "Localizable", "InfoPlist", "LaunchScreen"))

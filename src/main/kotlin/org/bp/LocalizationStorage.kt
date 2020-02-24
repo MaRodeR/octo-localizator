@@ -10,4 +10,6 @@ interface LocalizationStorage {
         return getAll(listOf(name))
             .firstOrNull()
     }
+
+    fun deleteAll(sourceName: String)
 }

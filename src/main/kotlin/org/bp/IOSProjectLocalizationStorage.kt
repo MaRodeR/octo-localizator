@@ -44,6 +44,10 @@ class IOSProjectLocalizationStorage(private val iOSProjectPath: String) : Locali
         return localization
     }
 
+    override fun deleteAll(sourceName: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private fun getProjectFolder(): File {
         val projectFolder = File(iOSProjectPath)
         if (!projectFolder.exists() || !projectFolder.isDirectory) {
