@@ -60,19 +60,26 @@ class GoogleSheetLocalizationStorage(
 
     override fun save(localization: LocalizationSource) {
 
-        val sheetTitle = localization.name
+        var newLocalization = localization
+
+        val sheetTitle = newLocalization.name
         val sheet = service.getListOfSheetsFor(spreadSheetId)
             .findByTitle(sheetTitle)
 
         if (sheet == null) {
             createSheet(spreadSheetId, sheetTitle)
+        } else {
+            val existLocalization = getBy(sheetTitle)
+            existLocalization?.let {
+                newLocalization = it.merge(newLocalization)
+            }
         }
 
-        val locales = localization.getExistsLocaleNames()
+        val locales = newLocalization.getExistsLocaleNames()
 
         val headers = mutableListOf("key") + locales
 
-        val rows: List<List<String>> = localization.values
+        val rows: List<List<String>> = newLocalization.values
             .map { localizedString ->
                 val row = mutableListOf(localizedString.key)
                 locales.forEach { locale -> row.add(localizedString.values.getOrDefault(locale, "")) }
@@ -141,11 +148,7 @@ class GoogleSheetLocalizationStorage(
             if (config.size != 2) {
                 throw IllegalStateException("File '$configFilePath' must contain credentials in format 'accountId spreadSheetId")
             }
-            return GoogleSheetLocalizationStorage(
-                config[1],
-                config[0],
-                pkFilePath
-            )
+            return GoogleSheetLocalizationStorage(config[1], config[0], pkFilePath)
         }
 
         private fun List<Sheet>.findByTitle(sheetName: String): Sheet? =

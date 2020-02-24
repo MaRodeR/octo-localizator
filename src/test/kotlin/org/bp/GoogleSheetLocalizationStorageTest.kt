@@ -44,7 +44,7 @@ class GoogleSheetLocalizationStorageTest {
 
         assertThat(loadedLocalizationSource?.values)
             .containsExactlyInAnyOrder(
-//                LocalizedString("greeting", mutableMapOf("en" to "Hello", "ru" to "Привет")),
+                LocalizedString("greeting", mutableMapOf("en" to "Hello", "ru" to "Привет", "de" to "")),
                 LocalizedString("goodbuy", mutableMapOf("en" to "Buy", "ru" to "До свидания", "de" to "Tschüss")),
                 LocalizedString("map", mutableMapOf("en" to "Map", "ru" to "Карта", "de" to ""))
             )
