@@ -4,6 +4,8 @@ interface LocalizationStorage {
 
     fun save(localization: LocalizationSource)
 
+    fun updateExisting(localization: LocalizationSource)
+
     fun getAll(sourceNames: List<String>? = null): List<LocalizationSource>
 
     fun getBy(name: String): LocalizationSource? {

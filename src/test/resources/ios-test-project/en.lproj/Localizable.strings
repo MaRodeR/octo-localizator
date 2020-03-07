@@ -1,6 +1,8 @@
-confirm = "Confirm";
+ confirm  =  "Confirm" ;
 oops = "Oops...";
 agree = "Agree";
 disagree = "Disagree";
 success = "Success!";
 mistake = "Mistake!";
+"error ?" = "Is it error?";
+"warning" = "";

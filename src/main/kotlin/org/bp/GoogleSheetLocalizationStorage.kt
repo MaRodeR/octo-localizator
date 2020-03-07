@@ -17,6 +17,45 @@ class GoogleSheetLocalizationStorage(
 
     private val service by lazy { getSheetsService() }
 
+    override fun save(localization: LocalizationSource) {
+
+        var newLocalization = localization
+
+        val sheetTitle = newLocalization.name
+        val sheet = service.getListOfSheetsFor(spreadSheetId)
+            .findByTitle(sheetTitle)
+
+        if (sheet == null) {
+            createSheet(spreadSheetId, sheetTitle)
+        } else {
+            val existLocalization = getBy(sheetTitle)
+            existLocalization?.let {
+                newLocalization = it.merge(newLocalization)
+            }
+        }
+
+        val locales = newLocalization.getExistsLocaleNames()
+
+        val headers = mutableListOf("key") + locales
+
+        val rows: List<List<String>> = newLocalization.values
+            .map { localizedString ->
+                val row = mutableListOf(localizedString.key)
+                locales.forEach { locale -> row.add(localizedString.values.getOrDefault(locale, "")) }
+                row
+            }
+
+        val values: List<List<String>> = mutableListOf(headers) + rows
+
+        service.spreadsheets().values().update(spreadSheetId, "$sheetTitle!A1", ValueRange().setValues(values))
+            .setValueInputOption("USER_ENTERED")
+            .execute()
+    }
+
+    override fun updateExisting(localization: LocalizationSource) {
+        TODO("not implemented")
+    }
+
     override fun getAll(sourceNames: List<String>?): List<LocalizationSource> {
 
         val sheets = service.getListOfSheetsFor(spreadSheetId)
@@ -56,41 +95,6 @@ class GoogleSheetLocalizationStorage(
         }
 
         return localizationSources
-    }
-
-    override fun save(localization: LocalizationSource) {
-
-        var newLocalization = localization
-
-        val sheetTitle = newLocalization.name
-        val sheet = service.getListOfSheetsFor(spreadSheetId)
-            .findByTitle(sheetTitle)
-
-        if (sheet == null) {
-            createSheet(spreadSheetId, sheetTitle)
-        } else {
-            val existLocalization = getBy(sheetTitle)
-            existLocalization?.let {
-                newLocalization = it.merge(newLocalization)
-            }
-        }
-
-        val locales = newLocalization.getExistsLocaleNames()
-
-        val headers = mutableListOf("key") + locales
-
-        val rows: List<List<String>> = newLocalization.values
-            .map { localizedString ->
-                val row = mutableListOf(localizedString.key)
-                locales.forEach { locale -> row.add(localizedString.values.getOrDefault(locale, "")) }
-                row
-            }
-
-        val values: List<List<String>> = mutableListOf(headers) + rows
-
-        service.spreadsheets().values().update(spreadSheetId, "$sheetTitle!A1", ValueRange().setValues(values))
-            .setValueInputOption("USER_ENTERED")
-            .execute()
     }
 
     override fun deleteAll(sourceName: String) {

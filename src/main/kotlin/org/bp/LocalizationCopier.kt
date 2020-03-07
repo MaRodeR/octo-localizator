@@ -6,4 +6,9 @@ class LocalizationCopier {
         fromStorage.getAll(sourceNames)
             .forEach { toStorage.save(it) }
     }
+
+    fun updateExisting(fromStorage: LocalizationStorage, toStorage: LocalizationStorage, sourceNames: List<String>? = null) {
+        fromStorage.getAll(sourceNames)
+            .forEach { toStorage.updateExisting(it) }
+    }
 }

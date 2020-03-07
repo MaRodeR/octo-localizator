@@ -5,7 +5,7 @@ import java.nio.file.Paths
 
 class IOSProjectLocalizationStorage(private val iOSProjectPath: String) : LocalizationStorage {
 
-
+    // TODO: replace on updateExisting method implementation. It will save comments in localization files
     override fun save(localization: LocalizationSource) {
         val projectFolder = getProjectFolder()
 
@@ -23,6 +23,34 @@ class IOSProjectLocalizationStorage(private val iOSProjectPath: String) : Locali
                 .joinToString("\n") { """"${it.key}" = "${it.values.getOrDefault(locale, "")}";""" }
 
             localizationFile.writeText(keyToValueString)
+        }
+    }
+
+    //TODO: add support for multiline localized strings
+    override fun updateExisting(localization: LocalizationSource) {
+        val localeToKeyValueMap = localization.values
+            .flatMap { localizedString ->
+                localizedString.values.map { localeToValue ->
+                    Triple(localizedString.key, localeToValue.key, localeToValue.value)
+                }
+            }
+            .groupBy { triple -> triple.second }
+            .mapValues { entry -> entry.value.map { triple -> triple.first to triple.third }.toMap() }
+
+        localeToKeyValueMap.forEach { (locale, keyValueMap) ->
+            val localizationFile = Paths.get(iOSProjectPath, "$locale.lproj", "${localization.name}.strings").toFile()
+            if (localizationFile.exists()) {
+                val lines = localizationFile.readLines().toMutableList()
+                keyValueMap.forEach { (stringKey, stringValue) ->
+                    val indexOfExistingString = lines.indexOfFirst {
+                        it.matches(""" *"?${Regex.escape(stringKey)}"? *= *".*" *; *""".toRegex())
+                    }
+                    if (indexOfExistingString >= 0) {
+                        lines[indexOfExistingString] = """"$stringKey" = "$stringValue";"""
+                    }
+                }
+                localizationFile.writeText(lines.joinToString("\n") + "\n")
+            }
         }
     }
 
